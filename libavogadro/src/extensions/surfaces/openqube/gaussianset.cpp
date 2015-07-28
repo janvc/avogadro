@@ -445,12 +445,60 @@ void GaussianSet::initCalculation()
         break;
     }
     case G:
-        skip = 15;
+        /*
+          There are 15 cartesian G-functions (l = 4)
+          Type      Normalization
+          xxxx      [(524288 * alpha^11) / (11025 * pi^3)] ^ (1/4)
+          xxxy      [(524288 * alpha^11) / (225 * pi^3)] ^ (1/4)
+          xxxz      [(524288 * alpha^11) / (225 * pi^3)] ^ (1/4)
+          xxyy      [(524288 * alpha^11) / (81 * pi^3)] ^ (1/4)
+          xxyz      [(524288 * alpha^11) / (9 * pi^3)] ^ (1/4)
+          xxzz      [(524288 * alpha^11) / (81 * pi^3)] ^ (1/4)
+          xyyy      [(524288 * alpha^11) / (225 * pi^3)] ^ (1/4)
+          xyyz      [(524288 * alpha^11) / (9 * pi^3)] ^ (1/4)
+          xyzz      [(524288 * alpha^11) / (9 * pi^3)] ^ (1/4)
+          xzzz      [(524288 * alpha^11) / (225 * pi^3)] ^ (1/4)
+          yyyy      [(524288 * alpha^11) / (11025 * pi^3)] ^ (1/4)
+          yyyz      [(524288 * alpha^11) / (225 * pi^3)] ^ (1/4)
+          yyzz      [(524288 * alpha^11) / (81 * pi^3)] ^ (1/4)
+          yzzz      [(524288 * alpha^11) / (225 * pi^3)] ^ (1/4)
+          zzzz      [(524288 * alpha^11) / (11025 * pi^3)] ^ (1/4)
+
+          (524288 / (11025 * pi^3)) ^ (1/4) = 1.11284691281641
+          (524288 / (225 * pi^3)) ^ (1/4)   = 2.94431617859819
+          (524288 / (81 * pi^3)) ^ (1/4)    = 3.80109584189328
+          (524288 / (9 * pi^3)) ^ (1/4)     = 6.58369112259796
+         */
+    {
+        double norm1 = 1.11284691281641;
+        double norm2 = 2.94431617859819;
+        double norm3 = 3.80109584189328;
+        double norm4 = 6.58369112259796;
+
         m_moIndices[i] = indexMO;
-        indexMO += skip;
+        indexMO += 15;
         m_cIndices.push_back(m_gtoCN.size());
-        qDebug() << m_symmetry[i] << " Basis set not handled - results may be incorrect.";
+
+        for (unsigned int j = m_gtoIndices[i]; j < m_gtoIndices[i+1]; j++)
+        {
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm1);    // xxxx
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm2);    // xxxy
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm2);    // xxxz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm3);    // xxyy
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm4);    // xxyz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm3);    // xxzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm2);    // xyyy
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm4);    // xyyz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm4);    // xyzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm2);    // xzzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm1);    // yyyy
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm2);    // yyyz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm3);    // yyzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm2);    // yzzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 2.75) * norm1);    // zzzz
+        }
         break;
+    }
     case G9:
     {
         // Spherical - 9 G components
@@ -499,12 +547,68 @@ void GaussianSet::initCalculation()
         break;
     }
     case H:
-      skip = 21;
-      m_moIndices[i] = indexMO;
-      indexMO += skip;
-      m_cIndices.push_back(m_gtoCN.size());
-      qDebug() << m_symmetry[i] << " Basis set not handled - results may be incorrect.";
-      break;
+        /*
+          There are 21 cartesian H-functions (l = 5)
+          Type      Normalization
+          xxxxx     [(8388608 * alpha^13) / (893025 * pi^3)] ^ (1/4)
+          xxxxy     [(8388608 * alpha^13) / ( 11025 * pi^3)] ^ (1/4)
+          xxxxz     [(8388608 * alpha^13) / ( 11025 * pi^3)] ^ (1/4)
+          xxxyy     [(8388608 * alpha^13) / (  2025 * pi^3)] ^ (1/4)
+          xxxyz     [(8388608 * alpha^13) / (   225 * pi^3)] ^ (1/4)
+          xxxzz     [(8388608 * alpha^13) / (  2025 * pi^3)] ^ (1/4)
+          xxyyy     [(8388608 * alpha^13) / (  2025 * pi^3)] ^ (1/4)
+          xxyyz     [(8388608 * alpha^13) / (    81 * pi^3)] ^ (1/4)
+          xxyzz     [(8388608 * alpha^13) / (    81 * pi^3)] ^ (1/4)
+          xxzzz     [(8388608 * alpha^13) / (  2025 * pi^3)] ^ (1/4)
+          xyyyy     [(8388608 * alpha^13) / ( 11025 * pi^3)] ^ (1/4)
+          xyyyz     [(8388608 * alpha^13) / (   225 * pi^3)] ^ (1/4)
+          xyyzz     [(8388608 * alpha^13) / (    81 * pi^3)] ^ (1/4)
+          xyzzz     [(8388608 * alpha^13) / (   225 * pi^3)] ^ (1/4)
+          xzzzz     [(8388608 * alpha^13) / ( 11025 * pi^3)] ^ (1/4)
+          yyyyy     [(8388608 * alpha^13) / (893025 * pi^3)] ^ (1/4)
+          yyyyz     [(8388608 * alpha^13) / ( 11025 * pi^3)] ^ (1/4)
+          yyyzz     [(8388608 * alpha^13) / (  2025 * pi^3)] ^ (1/4)
+          yyzzz     [(8388608 * alpha^13) / (  2025 * pi^3)] ^ (1/4)
+          yzzzz     [(8388608 * alpha^13) / ( 11025 * pi^3)] ^ (1/4)
+          zzzzz     [(8388608 * alpha^13) / (893025 * pi^3)] ^ (1/4)
+         */
+    {
+        double Norm_XXXXX = pow((8388608.0 / (893025.0 * M_PI*M_PI*M_PI)), 0.25);
+        double Norm_XXXXY = pow((8388608.0 / ( 11025.0 * M_PI*M_PI*M_PI)), 0.25);
+        double Norm_XXXYY = pow((8388608.0 / (  2025.0 * M_PI*M_PI*M_PI)), 0.25);
+        double Norm_XXXYZ = pow((8388608.0 / (   225.0 * M_PI*M_PI*M_PI)), 0.25);
+        double Norm_XXYYZ = pow((8388608.0 / (    81.0 * M_PI*M_PI*M_PI)), 0.25);
+
+        m_moIndices[i] = indexMO;
+        indexMO += 21;
+        m_cIndices.push_back(m_gtoCN.size());
+
+        for (unsigned int j = m_gtoIndices[i]; j < m_gtoIndices[i+1]; j++)
+        {
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xxxxx
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xxxxy
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xxxxz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xxxyy
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xxxyz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xxxzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xxyyy
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xxyyz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xxyzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xxzzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xyyyy
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xyyyz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xyyzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xyzzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // xzzzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // yyyyy
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // yyyyz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // yyyzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // yyzzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // yzzzz
+            m_gtoCN.push_back(m_gtoC[j] * pow(m_gtoA[j], 3.25) * Norm_XXXXX);   // zzzzz
+        }
+        break;
+    }
     case H11:
     {
         // Spherical - 11 H components
