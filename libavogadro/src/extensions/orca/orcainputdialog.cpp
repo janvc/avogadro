@@ -4,7 +4,7 @@
   Copyright (C) 2014 Dagmar Lenk
 
   This file is part of the Avogadro molecular editor project.
-  For more information, see <http://avogadro.openmolecules.net/>
+  For more information, see <http://avogadro.cc/>
 
   Avogadro is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@
 #include <openbabel/mol.h>
 
 #include <Eigen/Geometry>
-#include <Eigen/LeastSquares>
 
 #include <vector>
 
@@ -171,6 +170,7 @@ OrcaInputDialog::OrcaInputDialog(QWidget *parent, Qt::WindowFlags f ) :
       connect( ui.controlCosXCheck, SIGNAL( toggled( bool ) ), this, SLOT( setControlUseCosX( bool ) ) );
       connect( ui.controlDFTCheck, SIGNAL( toggled( bool ) ), this, SLOT( setControlUseDFT( bool ) ) );
       connect( ui.controlMP2Check, SIGNAL( toggled( bool ) ),this, SLOT( setControlUseMP2( bool ) ) );
+      connect( ui.controlCCSDCheck, SIGNAL( toggled( bool ) ),this, SLOT( setControlUseCCSD( bool ) ) );
 
       // Advanced SCF Slots
 
@@ -816,8 +816,9 @@ OrcaInputDialog::OrcaInputDialog(QWidget *parent, Qt::WindowFlags f ) :
 
       if (value) {
           ui.controlDFTCheck->setEnabled(!value);
+          ui.controlCCSDCheck->setEnabled(false);
           ui.basisAuxCorrBasisSetCombo->setEnabled(value);
-//          ui.basisAuxCorrECPCheck->setEnabled(value);
+          //          ui.basisAuxCorrECPCheck->setEnabled(value);
 
           if (!controlData->cosXEnabled()) {
               ui.basisAuxBasisSetCombo->setEnabled(!value);
@@ -1095,6 +1096,8 @@ OrcaInputDialog::OrcaInputDialog(QWidget *parent, Qt::WindowFlags f ) :
               }
           } else if ( controlData->mp2Enabled()) {
               mol << "RI-MP2 ";
+          } else if ( controlData->ccsdEnabled()) {
+              mol << "CCSD ";
           } else {
               mol << scfData->getTypeTxt() << " ";
           }

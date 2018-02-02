@@ -36,9 +36,9 @@
 #include "primitivelist.h"
 #include "residue.h"
 #include "zmatrix.h"
+#include "leastsquares.h"
 
 #include <Eigen/Geometry>
-#include <Eigen/LeastSquares>
 
 #include <vector>
 
@@ -779,11 +779,18 @@ namespace Avogadro{
     else {
       // Calculate a new estimate (e.g., the geometry changed
       Vector3d dipoleMoment(0.0, 0.0, 0.0);
+
       foreach (Atom *a, atoms())
         dipoleMoment += *a->pos() * a->partialCharge();
 
+      // convert from electrons * Angstrom to Debye
+      // (1.602176487×10−19 C / electron) *  (1.0e-10 m/Ang / 3.33564e-30 C/m)
+      // use the negative to go from positive to negative charge (Chemistry)
+      dipoleMoment *= -4.8032046729977;
+
       if (estimate)
         *estimate = true;
+
       m_estimatedDipoleMoment = true;
       return dipoleMoment;
     }
@@ -1901,7 +1908,8 @@ namespace Avogadro{
         }
         d->center /= static_cast<double>(nAtoms);
         Eigen::Hyperplane<double, 3> planeCoeffs;
-        Eigen::fitHyperplane(numAtoms(), atomPositions, &planeCoeffs);
+        fitHyperplane(numAtoms(), atomPositions, &planeCoeffs);
+
         delete[] atomPositions;
         d->normalVector = planeCoeffs.normal();
       }

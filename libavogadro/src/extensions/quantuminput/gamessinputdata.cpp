@@ -39,7 +39,7 @@ namespace Avogadro
       if ( pos>=bytecount ) return -1;
       if ( Buffer[pos]=='\0' ) return -1;
       test = 2;
-      while (( Buffer[pos+test] == KeyWord[test] )&&( test<length ) ) test++;
+      while (( test<length ) && ( Buffer[pos+test] == KeyWord[test] ) ) test++;
       test = ( long ) test==length;
     }
     return pos;
@@ -1651,8 +1651,8 @@ short GamessDataGroup::SetTitle( const char *NewTitle, long length )
 
   long TitleStart=0, TitleEnd=length-1, i, j;
   //Strip blanks of both ends of title
-  while (( NewTitle[TitleStart] <= ' ' )&&( TitleStart<length ) ) TitleStart ++;
-  while (( NewTitle[TitleEnd] <= ' ' )&&( TitleEnd>0 ) ) TitleEnd --;
+  while ( ( TitleStart<length )&&(NewTitle[TitleStart] <= ' ' ) ) TitleStart ++;
+  while (( TitleEnd>0 )&&( NewTitle[TitleEnd] <= ' ' ) ) TitleEnd --;
   length = TitleEnd - TitleStart + 1;
 
   if ( length <= 0 ) return 0;

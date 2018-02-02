@@ -8,7 +8,7 @@
   Copyright (C) 2014 Dagmar Lenk
 
   This file is part of the Avogadro molecular editor project.
-  For more information, see <http://avogadro.openmolecules.net/>
+  For more information, see <http://avogadro.cc/>
 
   Avogadro is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@
 #include <openbabel/mol.h>
 
 #include <Eigen/Geometry>
-#include <Eigen/LeastSquares>
 
 #include <vector>
 
@@ -307,7 +306,7 @@ bool OrcaAnalyseDialog::createAnimation()
 
     m_animation->setFrame(1);
     m_animation->setFps(10);
-    m_animation->setLoopCount(0);
+    m_animation->setLoop(true);
     m_animation->setFrames(m_curFrames);
     m_animation->setMolecule(m_molecule);
 

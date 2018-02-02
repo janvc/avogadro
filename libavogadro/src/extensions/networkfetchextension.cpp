@@ -33,6 +33,7 @@
 #include <QtGui/QMessageBox>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QSslSocket>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDebug>
 
@@ -93,6 +94,8 @@ namespace Avogadro
       m_network = new QNetworkAccessManager(this);
       connect(m_network, SIGNAL(finished(QNetworkReply*)),
               this, SLOT(replyFinished(QNetworkReply*)));
+      connect(m_network, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)),
+              this, SLOT(printSslErrors(QNetworkReply*, const QList<QSslError>&)));
     }
     if (action->data() == "PDB") {
       // Prompt for a PDB name
@@ -105,7 +108,7 @@ namespace Avogadro
       if (!ok || pdbName.isEmpty())
         return 0;
       // Hard coding the PDB download URL - this could be used for other services
-      m_network->get(QNetworkRequest(QUrl("http://www.pdb.org/pdb/download/downloadFile.do?fileFormat=pdb&compression=NO&structureId=" + pdbName)));
+      m_network->get(QNetworkRequest(QUrl("http://www.rcsb.org/pdb/files/" + pdbName + ".pdb")));
 
       *m_moleculeName = pdbName + ".pdb";
     }
@@ -121,7 +124,7 @@ namespace Avogadro
         return 0;
       // Hard coding the NIH resolver download URL - this could be used for other services
       m_network->get(QNetworkRequest(
-          QUrl("http://cactus.nci.nih.gov/chemical/structure/" + structureName + "/sdf?get3d=true"
+          QUrl("https://cactus.nci.nih.gov/chemical/structure/" + structureName + "/sdf?get3d=true"
                + "&resolver=name_by_opsin,name_by_cir,name_by_chemspider"
                + "&requester=Avogadro")));
 
@@ -184,8 +187,22 @@ namespace Avogadro
     return redirectUrl;
   }
 
+  void NetworkFetchExtension::printSslErrors(QNetworkReply*,
+                                             const QList<QSslError> &errors)
+  {
+    foreach(const QSslError &error, errors) {
+      qDebug() << tr("SSL Error: %1").arg(error.errorString());
+    }
+  }
+
   void NetworkFetchExtension::replyFinished(QNetworkReply *reply)
   {
+    // Print error messages
+    if (reply->error() != QNetworkReply::NoError) {
+      qDebug() << tr("Network Error: %1").arg(reply->errorString());
+      return;
+    }
+
     // Read in all the data
     if (!reply->isReadable()) {
       QMessageBox::warning(qobject_cast<QWidget*>(parent()),
@@ -235,10 +252,15 @@ namespace Avogadro
       // we might not get an extension, so
       // try to guess from the content type
       OBFormat *format = OBConversion::FormatFromMIME(contentType.toAscii());
-      if (!format || !conv.SetInFormat(format))
-        // nothing is working!
-        return;
+      if (!format || !conv.SetInFormat(format)) {
+        // last try, use the m_moleculeName
+        info.setFile(*m_moleculeName);
+        if ( info.suffix().isEmpty() || !conv.SetInFormat(info.suffix().toAscii()) ) {
+          // nothing is working!
+          return;
+        }
       }
+    }
 
     // Now read it in with OpenBabel - we should add a wrapper class to automate
     OBMol *obmol = new OBMol;
